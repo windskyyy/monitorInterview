@@ -4,19 +4,21 @@ require_once "DB.php";
 
 $userInfo = [];
 
-echo "带*号的为必填!". PHP_EOL;
+echo "带*号的为必填! 其他的可用回车忽略". PHP_EOL;
 
-echo "*请输入姓名：  ";
+echo "*请输入姓名:  ";
 $userInfo['userName'] = input();
 echo "*请输入公司名: ";
 $userInfo['bName'] = input();
-echo "*请输入面试阶段 ： 投递，笔试，一面，二面，三面，加面，offer, dead： ";
+echo "请输入部门信息: ";
+$userInfo['department'] = input();
+echo "*请输入面试阶段: 投递，笔试，一面，二面，三面，加面，offer, dead： ";
 $userInfo['interviewStatus'] = input();
-echo "请输入面试结果 processing = 0， offer = 1， dead = 2  ";
+echo "请输入面试阶段 processing = 0， offer = 1， dead = 2  ";
 $userInfo['status'] = input();
 echo "请输入开始时间: ";
 $userInfo['startTime'] = input();
-echo "请输入结束时间： ";
+echo "请输入结束时间: ";
 $userInfo['endTime'] = input();
 
 
@@ -46,6 +48,9 @@ class Main {
         date_default_timezone_set("Asia/Shanghai");
     }
 
+    /**
+     * @param $userInfo
+     */
     public function run($userInfo) {
         // 参数校验
         $userInfo['userName']        = strval($userInfo['userName']);
@@ -85,15 +90,24 @@ class Main {
         }
 
         $funcName = "updateInfo";
-        if ($first) {
+        if ($first > 0) {
+            if ($first == 1) {
+                echo "*第一次输入，请输入邮箱: ";
+                $userInfo['email'] = input();
+                if (empty($userInfo['email'])) {
+                    echo "email param error".PHP_EOL;
+                    return ;
+                }
+                $userInfo['email'] = strval($userInfo['email']);
+                $userInfo['email'] = "'{$userInfo['email']}'";
+            }
             $funcName = "insertInfo";
         }
         $this->$funcName($userInfo);
     }
 
     /**
-     * @param $userName
-     * @param $bName
+     * @param $userInfo
      * @return bool|int     -1 表示 数据查询为空
      */
     private function isFirst($userInfo) {
@@ -102,18 +116,29 @@ class Main {
         ];
         $conditions = [
             "name = {$userInfo['userName']}",
-            "companyName = {$userInfo['bName']}",
         ];
         $ret = $this->db->select($this->tablename, $fields, $conditions);
         if ($ret === false) {
             return -1;
         }
         if ($ret[0]['count(1)'] == 0) {
-            return true;
+            return 1;
         }
-        return false;
+        $conditions = [
+            "name = {$userInfo['userName']}",
+            "companyName = {$userInfo['bName']}",
+        ];
+        $ret = $this->db->select($this->tablename, $fields, $conditions);
+        if ($ret[0]['count(1)'] == 0) {
+            return 2;
+        }
+        return 0;
     }
 
+    /**
+     * @param $userInfo
+     * @return bool
+     */
     private function judge($userInfo) {
         if (!isset($userInfo['userName']) || !isset($userInfo['bName']) || !isset($userInfo['interviewStatus'])) {
             echo "userName or bName or interviewStatus error\n";
@@ -141,6 +166,7 @@ class Main {
             'status'          => $userInfo['status'],
             'startTime'       => $userInfo['startTime'],
             'endTime'         => $userInfo['endTime'],
+            'email'           => $userInfo['email'],
         ];
         return $this->db->insert($this->tablename,$params);
     }
