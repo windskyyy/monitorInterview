@@ -1,7 +1,14 @@
 <?php
 
+/***
+ * Class DB
+ * 数据库封装类，支持insert，delete，update，select，具体参考函数上方说明
+ * 指定编码格式 utf8
+ */
+
+
 class DB {
-    public $sql         = "";
+    public  $sql         = "";
     private $mysql_conf = [];
 
     public function __construct () {
@@ -45,7 +52,7 @@ class DB {
     }
 
     // delete from [tablename] where [clause...]
-    public function delete ($tableName, $conditions) {
+    public function delete ($tableName, $conditions = []) {
         $sql = "delete from $tableName ";
         $first = 1;
         foreach ($conditions as $condition) {
@@ -61,7 +68,7 @@ class DB {
     }
 
     // update [tablename] set [... = ...], [... = ...] where [conditions]";
-    public function update($tableName, $params, $conditions) {
+    public function update($tableName, $params, $conditions = []) {
         $sql = "update $tableName set ";
         $first = 1;
         foreach ($params as $key => $val) {
@@ -85,8 +92,11 @@ class DB {
     }
 
     // select [fields] from [tablename] where [condition and condition] group by [groups] order by [seq] limit [number];
-    public function select($tablename, $fields, $conditions) {
+    public function select($tablename, $fields, $conditions = [],  $distinct = false, $groups = [], $havings = [], $orders = []) {
         $sql = "select ";
+        if ($distinct == true) {
+            $sql .= " distinct ";
+        }
         $first = 1;
         foreach ($fields as $field) {
             if (!$first) {
@@ -103,6 +113,39 @@ class DB {
             }
             $sql .= $condition;
             $first = 0;
+        }
+        if (!empty($groups)) {
+            $sql .= " group by ";
+            $first = 1;
+            foreach ($groups as $group) {
+                if (!$first) {
+                    $sql .= " , ";
+                }
+                $sql .= " $group ";
+                $first = 0;
+            }
+            if (!empty($havings)) {
+                $sql .= " having ";
+                $first = 1;
+                foreach ($havings as $having) {
+                    if (!$first) {
+                        $sql .= ' and ';
+                    }
+                    $first = 0;
+                    $sql .= " $having ";
+                }
+            }
+        }
+        if(!empty($orders)) {
+            $sql .= " order by ";
+            $first = 1;
+            foreach ($orders as $order) {
+                if (!$first) {
+                    $sql .= " , ";
+                }
+                $first = 0;
+                $sql  .= " $order ";
+            }
         }
         return $this->getDbRes($sql, true);
     }
