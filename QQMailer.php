@@ -3,15 +3,11 @@
  * 封装邮件发送类
  * 使用qq邮箱发送
  */
-
-
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 require '/home/ubuntu/workspace/PHP/vendor/phpmailer/phpmailer/src/Exception.php';
 require '/home/ubuntu/workspace/PHP/vendor/phpmailer/phpmailer/src/PHPMailer.php';
 require '/home/ubuntu/workspace/PHP/vendor/phpmailer/phpmailer/src/SMTP.php';
-
 
 class QQMailer {
     public static $HOST    = 'smtp.qq.com'; // QQ 邮箱的服务器地址
@@ -20,7 +16,7 @@ class QQMailer {
     public static $CHARSET = 'UTF-8'; // 设置发送的邮件的编码
 
     private static $USERNAME = '1522972330@qq.com'; // 授权登录的账号
-    private static $PASSWORD = 'rddzynrrgsolbafc'; // 授权登录的密码
+    private static $PASSWORD = '************'; // 授权登录的密码
     private static $NICKNAME = 'windsky'; // 发件人的昵称
 
     /**
@@ -74,9 +70,13 @@ class QQMailer {
      */
     public function send($email, $title, $content) {
         $this->loadConfig();
+
         $this->mailer->addAddress($email); // 收件人邮箱
         $this->mailer->Subject = $title; // 邮件主题
-        $this->mailer->Body = $content; // 邮件信息
-        return (bool)$this->mailer->send(); // 发送邮件
+        $this->mailer->Body    = $content; // 邮件信息
+
+        $ret = (bool)$this->mailer->send(); // 发送邮件
+        $this->mailer->clearAllRecipients();
+        return $ret;
     }
 }
