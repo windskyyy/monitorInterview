@@ -20,7 +20,12 @@ echo "请输入开始时间: ";
 $userInfo['startTime'] = input();
 echo "请输入结束时间: ";
 $userInfo['endTime'] = input();
+echo "如果第一次输入，请输入邮箱: ";
+$userInfo['email'] = input();
 
+
+
+file_put_contents("/home/ubuntu/workspace/PHP/userInfoLog.log", var_export($userInfo, true).PHP_EOL);
 
 $site = new Main();
 
@@ -66,6 +71,16 @@ class Main {
         $userInfo['startTime']       = intval($userInfo['startTime']);
         $userInfo['endTime']         = intval($userInfo['endTime']);
 
+        if (!empty($userInfo['email'])) {
+            $userInfo['email'] = strval($userInfo['email']);
+            $userInfo['email'] = "'{$userInfo['email']}'";
+        }
+
+        if (!empty($userInfo['department'])) {
+            $userInfo['department'] = strval($userInfo['department']);
+            $userInfo['department'] = "'{$userInfo['department']}'";
+        }
+
         if (!$this->judge($userInfo)) {
             echo "参数错误\n";
             return ;
@@ -91,16 +106,6 @@ class Main {
 
         $funcName = "updateInfo";
         if ($first > 0) {
-            if ($first == 1) {
-                echo "*第一次输入，请输入邮箱: ";
-                $userInfo['email'] = input();
-                if (empty($userInfo['email'])) {
-                    echo "email param error".PHP_EOL;
-                    return ;
-                }
-                $userInfo['email'] = strval($userInfo['email']);
-                $userInfo['email'] = "'{$userInfo['email']}'";
-            }
             $funcName = "insertInfo";
         }
         $this->$funcName($userInfo);
@@ -116,6 +121,7 @@ class Main {
         ];
         $conditions = [
             "name = {$userInfo['userName']}",
+            "companyName = {$userInfo['bName']}",
         ];
         $ret = $this->db->select($this->tablename, $fields, $conditions);
         if ($ret === false) {
@@ -123,14 +129,6 @@ class Main {
         }
         if ($ret[0]['count(1)'] == 0) {
             return 1;
-        }
-        $conditions = [
-            "name = {$userInfo['userName']}",
-            "companyName = {$userInfo['bName']}",
-        ];
-        $ret = $this->db->select($this->tablename, $fields, $conditions);
-        if ($ret[0]['count(1)'] == 0) {
-            return 2;
         }
         return 0;
     }
@@ -166,8 +164,13 @@ class Main {
             'status'          => $userInfo['status'],
             'startTime'       => $userInfo['startTime'],
             'endTime'         => $userInfo['endTime'],
-            'email'           => $userInfo['email'],
         ];
+        if (!empty($userInfo['email'])) {
+            $params['email'] = $userInfo['email'];
+        }
+        if (!empty($userInfo['department'])) {
+            $params['department'] = $userInfo['department'];
+        }
         return $this->db->insert($this->tablename,$params);
     }
 
@@ -178,6 +181,12 @@ class Main {
             'startTime'       => $userInfo['startTime'],
             'endTime'         => $userInfo['endTime'],
         ];
+        if (!empty($userInfo['email'])) {
+            $params['email'] = $userInfo['email'];
+        }
+        if (!empty($userInfo['department'])) {
+            $params['department'] = $userInfo['department'];
+        }
         $conditions = [
             " name = {$userInfo['userName']} ",
             " companyName = {$userInfo['bName']} ",

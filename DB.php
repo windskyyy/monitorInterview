@@ -13,7 +13,7 @@ class DB {
 
     public function __construct () {
         $this->mysql_conf = array(
-            
+
         );
         $this->mysqli = @new mysqli($this->mysql_conf['host'], $this->mysql_conf['db_user'],
             $this->mysql_conf['db_pwd'], 'List', 10106);
@@ -91,7 +91,7 @@ class DB {
     // select [fields] from [tablename] where [condition and condition] group by [groups] order by [seq] limit [number];
     public function select($tablename, $fields, $conditions = [],  $distinct = false, $groups = [], $havings = [], $orders = []) {
         $sql = "select ";
-        if ($distinct == true) {
+        if ($distinct === true) {
             $sql .= " distinct ";
         }
         $first = 1;
@@ -102,11 +102,13 @@ class DB {
             $sql .= $field;
             $first = 0;
         }
-        $sql .= " from $tablename where ";
+        $sql .= " from $tablename  ";
         $first = 1;
         foreach ($conditions as $condition) {
             if (!$first) {
                 $sql .= ' and ';
+            } else {
+                $sql .= ' where ';
             }
             $sql .= $condition;
             $first = 0;
