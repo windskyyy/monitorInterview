@@ -51,7 +51,7 @@ class Main {
     /**
      * @param $userInfo
      */
-    public function run($userInfo) {
+    public function run ($userInfo) {
         // 参数校验
         $userInfo['userName']        = strval($userInfo['userName']);
         $userInfo['userName']        = "'{$userInfo['userName']}'";
