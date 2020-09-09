@@ -13,10 +13,7 @@ class DB {
 
     public function __construct () {
         $this->mysql_conf = array(
-            'host'    => 'cdb-027nnpt2.cd.tencentcdb.com',
-            'db'      => 'List',
-            'db_user' => 'root',
-            'db_pwd'  => 'Xtm_0124',
+            
         );
         $this->mysqli = @new mysqli($this->mysql_conf['host'], $this->mysql_conf['db_user'],
             $this->mysql_conf['db_pwd'], 'List', 10106);
