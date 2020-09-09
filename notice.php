@@ -52,5 +52,6 @@ foreach ($ret as $arr) {
     }
     if($need === true) {
         $email->send($receiver, "每日面试提醒", $message);
+        file_put_contents("/home/ubuntu/workspace/PHP/userInfoLog.log", "notice : ".$message.PHP_EOL);
     }
 }
